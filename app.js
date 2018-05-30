@@ -1,5 +1,5 @@
 var Suduko = (function sudukoIFFY($) {
-	alert("Here!");
+	$()
 	var _instance, _game, defaultConfig = {};
 
 	function init(config) {
@@ -12,6 +12,39 @@ var Suduko = (function sudukoIFFY($) {
 
 	function Game(config) {}
 	Game.prototype = {
+		/**
+		 * Handle keyup events.
+		 *
+		 * @param {jQuery.event} e Keyup event
+		 */
+		onKeyUp: function(e) {
+			var sectRow, sectCol, secIndex,
+				starttime, endtime, elapsed,
+				isValid = true,
+				val = $.trim($(e.currentTarget).val()),
+				row = $(e.currentTarget).data('row'),
+				col = $(e.currentTarget).data('col');
+			// Reset board validation class
+			$('.sudoku-container').removeClass('valid-matrix');
+			// Validate, but only if validate_on_insert is set to true
+			if (this.config.validate_on_insert) {
+				isValid = this.validateNumber(val, row, col, this.matrix.row[row][col]);
+				// Indicate error
+				$(e.currentTarget).toggleClass('sudoku-input-error', !isValid);
+			}
+			// Calculate section identifiers
+			sectRow = Math.floor(row / 3);
+			sectCol = Math.floor(col / 3);
+			secIndex = (row % 3) * 3 + (col % 3);
+			// Cache value in matrix
+			this.matrix.row[row][col] = val;
+			this.matrix.col[col][row] = val;
+			this.matrix.sect[sectRow][sectCol][secIndex] = val;
+		},
+		validateNumber: function(val, row, col, rowID, colID, oldNum) {
+			var isValid = true;
+			//TODO.
+		}
 		//1st Build GUI : 
 		buildGUI: function() {
 			var $td, $tr, $table = $('<table>').addClass('suduko-container');
