@@ -1,81 +1,69 @@
-var Suduko = (function sudukoIFFY($) {
-	$()
-	var _instance, _game, defaultConfig = {};
+var Sudoku = (function($) {
+	var _instance;
+	var _game;
+	var defaultConfiguration = {};
 
 	function init(config) {
-		confi = $.extend({}, config, defaultConfig);
-		_game = new Game(confi);
+		conf = $.extend({}, config, defaultConfiguration);
+		_game = new Game(conf);
 		return {
-			//** Public Methods.
-		}
+			//public methods.
+			getGameBoard: function() {
+				return _game.buildGUI();
+			},
+			solve: function() {
+				alert("Work Under Progress");
+			},
+			validate: function() {
+				alert('nothing to validate');
+			},
+			reset: function() {
+				alert('not Implemented yet')
+			}
+			//reset
+		};
 	}
 
-	function Game(config) {}
+	function Game(config) {
+		this.config = config;
+		this.$cellMatrix = {};
+		this.matrix = {};
+		return this;
+	}
+
+	function solve() {
+		alert("UnderProgress");
+	}
 	Game.prototype = {
-		/**
-		 * Handle keyup events.
-		 *
-		 * @param {jQuery.event} e Keyup event
-		 */
-		onKeyUp: function(e) {
-			var sectRow, sectCol, secIndex,
-				starttime, endtime, elapsed,
-				isValid = true,
-				val = $.trim($(e.currentTarget).val()),
-				row = $(e.currentTarget).data('row'),
-				col = $(e.currentTarget).data('col');
-			// Reset board validation class
-			$('.sudoku-container').removeClass('valid-matrix');
-			// Validate, but only if validate_on_insert is set to true
-			if (this.config.validate_on_insert) {
-				isValid = this.validateNumber(val, row, col, this.matrix.row[row][col]);
-				// Indicate error
-				$(e.currentTarget).toggleClass('sudoku-input-error', !isValid);
-			}
-			// Calculate section identifiers
-			sectRow = Math.floor(row / 3);
-			sectCol = Math.floor(col / 3);
-			secIndex = (row % 3) * 3 + (col % 3);
-			// Cache value in matrix
-			this.matrix.row[row][col] = val;
-			this.matrix.col[col][row] = val;
-			this.matrix.sect[sectRow][sectCol][secIndex] = val;
-		},
-		validateNumber: function(val, row, col, rowID, colID, oldNum) {
-			var isValid = true;
-			//TODO.
-		}
-		//1st Build GUI : 
+		//UI
 		buildGUI: function() {
-			var $td, $tr, $table = $('<table>').addClass('suduko-container');
-			//Go Over the rows.
-			for (let i = 0; i < 9; i++) {
+			var $td, $tr,
+				$table = $('<table>').addClass('sudoku-container');
+			for (var i = 0; i < 9; i++) {
 				$tr = $('<tr>');
-				this.cellMatrix[i] = {};
-				//Go over the Columns
-				for (let j = 0; j < 9; j++) {
-					this.cellMatrix[i][j] = $('<input>').attr('maxlength', 1)
-						//Keep row/ col Data
-						.data('row', i).data('col', j).on('keyup', $.proxy(this.onKeyUp, this));
+				this.$cellMatrix[i] = {};
+				for (var j = 0; j < 9; j++) {
+					// Build the input
+					this.$cellMatrix[i][j] = $('<input>').attr('maxlength', 1).data('row', i).data('col', j).on('keyup', $.proxy(this.onKeyUp, this));
 					$td = $('<td>').append(this.$cellMatrix[i][j]);
-					//calculate Section ID 
+					// Calculate section ID
 					sectIDi = Math.floor(i / 3);
 					sectIDj = Math.floor(j / 3);
-					//set the design for different sections.
+					// Set the design for different sections
 					if ((sectIDi + sectIDj) % 2 === 0) {
-						$td.addClass('suduko-section-one');
+						$td.addClass('sudoku-section-one');
 					} else {
-						$td.addClass('suduko-section-two');
+						$td.addClass('sudoku-section-two');
 					}
-					//Build the Row.
+					// Build the row
 					$tr.append($td);
 				}
-				//Append to Table
+				// Append to table
 				$table.append($tr);
 			}
-			//return the GUI table
+			// Return the GUI table
 			return $table;
-		}
+		},
 	}
 	return {
 		getInstance: function(config) {
